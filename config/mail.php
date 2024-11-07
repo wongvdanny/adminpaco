@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'log'),
+    'default' => env('MAIL_MAILER', 'smtp'),
 
     /*
     |--------------------------------------------------------------------------
@@ -30,22 +30,23 @@ return [
     | your mailers below. You may also add additional mailers if needed.
     |
     | Supported: "smtp", "sendmail", "mailgun", "ses", "ses-v2",
-    |            "postmark", "log", "array", "failover", "roundrobin"
+    |            "postmark", "resend", "log", "array",
+    |            "failover", "roundrobin"
     |
     */
 
     'mailers' => [
 
         'smtp' => [
-            'transport' => 'smtp',
-            'url' => env('MAIL_URL'),
-            'host' => env('MAIL_HOST', '127.0.0.1'),
-            'port' => env('MAIL_PORT', 2525),
-            'encryption' => env('MAIL_ENCRYPTION', 'tls'),
-            'username' => env('MAIL_USERNAME'),
-            'password' => env('MAIL_PASSWORD'),
-            'timeout' => null,
-            'local_domain' => env('MAIL_EHLO_DOMAIN'),
+            'transport'    => 'smtp',
+            'url'          => env('MAIL_URL'),
+            'host'         => env('MAIL_HOST', '127.0.0.1'),
+            'port'         => env('MAIL_PORT', 2525),
+            'encryption'   => env('MAIL_ENCRYPTION', 'tls'),
+            'username'     => env('MAIL_USERNAME'),
+            'password'     => env('MAIL_PASSWORD'),
+            'timeout'      => null,
+            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
 
         'ses' => [
@@ -54,20 +55,26 @@ return [
 
         'postmark' => [
             'transport' => 'postmark',
+
             // 'message_stream_id' => env('POSTMARK_MESSAGE_STREAM_ID'),
+
             // 'client' => [
             //     'timeout' => 5,
             // ],
         ],
 
+        'resend' => [
+            'transport' => 'resend',
+        ],
+
         'sendmail' => [
             'transport' => 'sendmail',
-            'path' => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs -i'),
+            'path'      => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs -i'),
         ],
 
         'log' => [
             'transport' => 'log',
-            'channel' => env('MAIL_LOG_CHANNEL'),
+            'channel'   => env('MAIL_LOG_CHANNEL'),
         ],
 
         'array' => [
@@ -76,12 +83,21 @@ return [
 
         'failover' => [
             'transport' => 'failover',
+
             'mailers' => [
                 'smtp',
                 'log',
             ],
         ],
 
+        'roundrobin' => [
+            'transport' => 'roundrobin',
+
+            'mailers' => [
+                'ses',
+                'postmark',
+            ],
+        ],
     ],
 
     /*
@@ -96,8 +112,39 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'Example'),
+        'address' => env('MAIL_FROM_ADDRESS'),
+        'name'    => env('MAIL_FROM_NAME'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Global "Admin" Address
+    |--------------------------------------------------------------------------
+    |
+    | General admin related admins, such as order notifications.
+    |
+    */
+
+    'admin' => [
+        'address' => env('ADMIN_MAIL_ADDRESS'),
+        'name'    => env('ADMIN_MAIL_NAME', 'Admin'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Global "Contact" Address
+    |--------------------------------------------------------------------------
+    |
+    | General contact address used in the footer of the email templates.
+
+    | Here, you may specify a name and address that is used globally for
+    | all e-mails that are sent by your application.
+    |
+    */
+
+    'contact' => [
+        'address' => env('CONTACT_MAIL_ADDRESS'),
+        'name'    => env('CONTACT_MAIL_NAME', 'Contact'),
     ],
 
 ];
